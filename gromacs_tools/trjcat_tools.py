@@ -9,5 +9,19 @@ def trjcatspan(x,y):
         part_list.append(partnumber)
     return "gmx trjcat -f "+" ".join(part_list)+" -o step7_production.cat"+str(first_part)+"_"+str(last_part)+".xtc"
 
+#print(trjcatspan(75, 83))
 
-print(trjcatspan(75,83))
+#this generates index group sequence for merging operation in gmx make_ndx
+def ndx_groups(x, y):
+    sequence = range(x, y+1)
+    index_list = []
+    for i in sequence:
+        index_list.append(str(i))
+    return " | ".join(index_list)
+
+
+print(ndx_groups(321, 335))
+
+
+
+
