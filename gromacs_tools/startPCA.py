@@ -3,6 +3,14 @@ import os
 import shlex
 
 
+def main():
+    #cwd = os.getcwd()
+    cwd = "/home/yasmin/Desktop/run002/"
+
+    initialize()
+    calculatecov(cwd)
+
+    
 # load gromacs on local
 def initialize():
     src = shlex.split("env -i bash -c 'source /usr/local/gromacs/bin/GMXRC'")
@@ -10,7 +18,7 @@ def initialize():
     for line in process.stdout:
         print(line)
 
-    # load gromacs on cluster
+    # load gromacs on cluster:
     # subprocess.call("module load GROMACS/2020.2_GPU",shell=True)
 
 
@@ -20,12 +28,12 @@ def getpaths(cwd):
     ndx_path = os.path.join(cwd, "analyses_2_28", "elements_ndx")     #supply path to index files
     trajectories = os.listdir(trjs_path)
     subgroups = ["cAlpha", "arrcAlpha", "ntrcAlpha"]                  #supply appropriate index file names
-    pathlist = [trajectories, trjs_path, subgroups, ndx_path]
-    return pathlist
+    return trajectories, trjs_path, subgroups, ndx_path
 
 
 # invoke covariance matrix construction using gmx covar
-def calculatecov(wd, trajectories, trjs_path, subgroups, ndx_path):
+def calculatecov(wd):
+    trajectories, trjs_path, subgroups, ndx_path = getpaths(wd)
     for traj in trajectories:
         trajn = traj.split(sep=".")
         trj_path = os.path.join(trjs_path,traj)
@@ -42,9 +50,7 @@ def calculatecov(wd, trajectories, trjs_path, subgroups, ndx_path):
             subprocess.call(ev12command, shell=True)
 
 
-#cwd = os.getcwd()
-cwd = "/home/yasmin/Desktop/run002/"
-
-initialize()
-paths = getpaths(cwd)
-#calculatecov(cwd, paths[0], paths[1], paths[2], paths[3])
+if __name__ == "__main__":
+    main()
+    
+    
