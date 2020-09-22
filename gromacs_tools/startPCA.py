@@ -30,6 +30,10 @@ def initialize(machine):
     else:
         print("\nInitialization didn't work.")
 
+# small utility for subsetting list of files in directoy to trajectories only
+def onlyxtc(elements):
+    return [element for element in elements if element[-4:] == ".xtc"]
+
 
 # paths to in and out files
 def getpaths(cwd, mode):
@@ -39,7 +43,7 @@ def getpaths(cwd, mode):
     elif mode == "cluster":
         trjs_path = os.path.join(cwd, "results")                        # trajectories cluster
         ndx_path = os.path.join(cwd, "elements_ndx")                    # index files cluster
-    trajectories = os.listdir(trjs_path)
+    trajectories = onlyxtc(os.listdir(trjs_path))
     subgroups = ["cAlpha", "arrcAlpha", "ntrcAlpha"]                    # supply appropriate index file names
     return trajectories, trjs_path, subgroups, ndx_path
 

@@ -10,7 +10,8 @@ def trjcatspan(x,y):
     #part_list = ["step7_production.part"+str(i).zfill(4)+".xtc" for i in select_parts if i != None]
     return "gmx trjcat -f "+" ".join(part_list)+" -o step7_production.cat"+str(first_part)+"_"+str(last_part)+".xtc"
 
-#print(trjcatspan(75, 83))
+print(trjcatspan(75, 80))
+
 
 #this generates index group sequence for merging operation in gmx make_ndx
 def ndx_groups(x, y):
@@ -21,7 +22,8 @@ def ndx_groups(x, y):
 
     return " | ".join(index_list)
 
-print(ndx_groups(321, 335))
+print(ndx_groups(631, 661))
+
 
 
 
