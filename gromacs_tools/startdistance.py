@@ -80,11 +80,16 @@ def calculatedist(cwd, mode):
                 ndx_name = element
                 ndxel_path = os.path.join(ndx_path, ndx_name)
                 bashscript.append(
-                    "gmx distance -f {trj} -s {c}/step7_production.tpr -n {ndx} -oav {out}/distavg_{tn}_{ele}.xvg -select \"cog of group finger plus cog of group TMD\"".format(
-                        trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[2], ele=element.split(".")[0]))
+                    "gmx distance -f {trj} -s {c}/step7_production.tpr -n {ndx} "
+                    "-oav {out}/distavg_{tn}_{ele}.xvg -select "    
+                    "\"cog of group finger plus cog of group TMD\"".format(
+                        trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath,
+                        tn=trajn.split("_")[3], ele=element.split(".")[0]))  #check trajn is actually at position [3]
         with open("startdistance.sh", "w") as f:
             f.write(
-                "#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --ntasks-per-node=9\n#SBATCH --cpus-per-task=2\n#SBATCH --mem=4096\n#SBATCH --mem-bind=local\n#SBATCH --nice=0\n#SBATCH --time=12:00:00\n#SBATCH --job-name=NTS1R_RMSD\nmodule load cuda/10.2.89\nmodule load GROMACS/2020.2_GPU\n")
+                "#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --ntasks-per-node=9\n#SBATCH --cpus-per-task=2"
+                "\n#SBATCH --mem=4096\n#SBATCH --mem-bind=local\n#SBATCH --nice=0\n#SBATCH --time=12:00:00"
+                "\n#SBATCH --job-name=NTS1R_RMSD\nmodule load cuda/10.2.89\nmodule load GROMACS/2020.2_GPU\n")
             f.write("\n".join(bashscript))
         print("\nYay, I wrote the startdistance.sh, let's go run it!")
 
