@@ -77,8 +77,11 @@ def calculatermsf(cwd, mode):
                 ndx_name = element
                 ndxel_path = os.path.join(ndx_path, ndx_name)
                 bashscript.append(
-                    "gmx rmsf -f {trj} -s {c}/step7_production.tpr -n {ndx} -res yes -o {out}/rmsf_{tn}_{ele}.xvg -od {out}/rmsf_dev_{tn}_{ele}.xvg -oc {out}/rmsf_correl_{tn}_{ele}.xvg -oq {out}/bfactor_{tn}_{ele}.pdb -ox {out}/xaver_{tn}_{ele}.pdb".format(
-                    trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[2], ele=element.split(".")[0]))
+                    "gmx rmsf -f {trj} -s {c}/step7_production.tpr -n {ndx} -b 2500000 -e 3000000 "       #add optionally -b and -e
+                    "-res yes -o {out}/rmsf_{tn}_{ele}.xvg -od {out}/rmsf_dev_{tn}_{ele}.xvg "
+                    "-oc {out}/rmsf_correl_{tn}_{ele}.xvg -oq {out}/bfactor_{tn}_{ele}.pdb "
+                    "-ox {out}/xaver_{tn}_{ele}.pdb".format(
+                    trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[3], ele=element.split(".")[0]))
         with open("startRMSF.sh", "w") as f:
             f.write(
                 "#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --ntasks-per-node=9\n#SBATCH --cpus-per-task=2\n#SBATCH --mem=4096\n#SBATCH --mem-bind=local\n#SBATCH --nice=0\n#SBATCH --time=12:00:00\n#SBATCH --job-name=NTS1R_RMSF\nmodule load cuda/10.2.89\nmodule load GROMACS/2020.2_GPU\n")
