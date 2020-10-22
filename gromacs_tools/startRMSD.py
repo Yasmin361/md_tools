@@ -17,7 +17,7 @@ def main():
     calculaterms(cwd, mode)
 
 
-# small utility for subsetting list of files in directoy to trajectories only
+# small utility for subsetting list of files in directory to trajectories only
 def onlyxtc(elements):
     return [element for element in elements if element[-4:] == ".xtc"]
 
@@ -44,7 +44,7 @@ def getpaths(cwd, mode):
         ndx_path = os.path.join(cwd, "analyses_2_28", "elements_ndx")  # index files local
     elif mode == "cluster":
         trjs_path = os.path.join(cwd, "results")  # trajectories cluster
-        ndx_path = os.path.join(cwd, "elements_ndx")  # index files cluster
+        ndx_path = os.path.join(cwd, "elements_ndx", "used")  # index files cluster
     trajectories = onlyxtc(os.listdir(trjs_path))
     # subgroups = ["prot.ndx", "ntr.ndx", "arr.ndx"]  # supply appropriate index file names
     subgroups = os.listdir(ndx_path)
@@ -77,15 +77,16 @@ def calculaterms(cwd, mode):
                 ndx_name = element
                 ndxel_path = os.path.join(ndx_path, ndx_name)
                 bashscript.append(
-                    "gmx rms -f {trj} -s {c}/step7_production.tpr -n {ndx} -o {out}/rmsd_{tn}_{ele}.xvg -tu ns".format(
-                        trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[2], ele=element.split(".")[0]))
+                    "echo 1 0 | gmx rms -f {trj} -s {c}/step7_production.tpr "
+                    "-n {ndx} -o {out}/rmsd_{tn}_{ele}.xvg -tu ns".format(
+                        trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[3],  #check trajn at [3]
+                        ele=element.split(".")[0]))
         with open("startRMSD.sh", "w") as f:
             f.write(
                 "#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --ntasks-per-node=9\n#SBATCH --cpus-per-task=2\n#SBATCH --mem=4096\n#SBATCH --mem-bind=local\n#SBATCH --nice=0\n#SBATCH --time=12:00:00\n#SBATCH --job-name=NTS1R_RMSD\nmodule load cuda/10.2.89\nmodule load GROMACS/2020.2_GPU\n")
             f.write("\n".join(bashscript))
         print("\nYay, I wrote the startRMSD.sh, let's go run it!")
 
+
 if __name__ == "__main__":
     main()
-
-
