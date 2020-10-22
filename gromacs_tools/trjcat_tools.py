@@ -22,7 +22,7 @@ def ndx_groups(x, y):
 
     return " | ".join(index_list)
 
-print(ndx_groups(631, 661))
+print(ndx_groups(91, 101))
 
 
 
