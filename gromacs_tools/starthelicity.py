@@ -41,21 +41,17 @@ def initialize(machine):
 def getpaths(cwd, mode):
     if mode == "local":
         trjs_path = os.path.join(cwd, "analyses_2_28", "trjs")  # trajectories local
-        ndx_path = os.path.join(cwd, "analyses_2_28", "elements_ndx")  # index files local
     elif mode == "cluster":
         trjs_path = os.path.join(cwd, "results")  # trajectories cluster
-        ndx_path = os.path.join(cwd, "elements_ndx")  # index files cluster
     trajectories = onlyxtc(os.listdir(trjs_path))
-    subgroups = ["fingerL.ndx","onesixtyL.ndx","arrhelixI.ndx"]  # supply appropriate index file names
     #subgroups = os.listdir(ndx_path)
-    return trajectories, trjs_path, subgroups, ndx_path
+    return trajectories, trjs_path
 
 
 # calculates helix properties of given groups over trajectories
 def calculatehelix(cwd, mode):
-    trajectories, trjs_path, subgroups, ndx_path = getpaths(cwd, mode)
+    trajectories, trjs_path = getpaths(cwd, mode)
     if mode == "local":
-        pass
         """
         for traj in trajectories:
             trajn = traj.split(".")[0]
@@ -76,14 +72,11 @@ def calculatehelix(cwd, mode):
             trj_path = os.path.join(trjs_path, traj)
             outpath = os.path.join(cwd, "results", "helicity", trajn)  # outpath cluster
             bashscript.append("mkdir -p " + outpath)
-            for element in subgroups:
-                ndx_name = element
-                ndxel_path = os.path.join(ndx_path, ndx_name)
-                bashscript.append(
-                    "echo 1 0 | gmx helix -f {trj} -s {c}/step7_production.tpr -n {ndx} "
-                    "-cz {out}/helix_{tn}_{ele}.gro".format(
-                        trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath,
-                        tn=trajn.split("_")[3], ele=element.split(".")[0]))  #check trajn is actually at position [3]
+            bashscript.append(
+                "gmx rama -f {trj} -s {c}/step7_production.tpr -b 2500000 -e 3000000 "
+                "-o {out}/ramachandran_{tn}.xvg".format(
+                    trj=trj_path, c=cwd, out=outpath,
+                    tn=trajn.split("_")[3]))  #check trajn is actually at position [3]
         with open("starthelicity.sh", "w") as f:
             f.write(
                 "#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --ntasks-per-node=9\n#SBATCH --cpus-per-task=2"
