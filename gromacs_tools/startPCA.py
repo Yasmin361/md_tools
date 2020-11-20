@@ -44,7 +44,7 @@ def getpaths(cwd, mode):
         trjs_path = os.path.join(cwd, "results")                        # trajectories cluster
         ndx_path = os.path.join(cwd, "elements_ndx")                    # index files cluster
     trajectories = onlyxtc(os.listdir(trjs_path))
-    subgroups = ["cAlpha", "arrcAlpha", "ntrcAlpha"]                    # supply appropriate index file names
+    subgroups = ["cAlpha"]                    # supply appropriate index file names
     return trajectories, trjs_path, subgroups, ndx_path
 
 
@@ -73,21 +73,29 @@ def calculatecov(cwd, mode):
     elif mode == "cluster":
         bashscript = []
         for traj in trajectories:
-            trajn = traj.split(".")
+            trajn = traj.split(".")[0]
             trj_path = os.path.join(trjs_path, traj)
             for element in subgroups:
                 ndx_name = element + ".ndx"
                 ndxel_path = os.path.join(ndx_path, ndx_name)
-                outpath = os.path.join(cwd, "results", "pca", trajn[0], element)  # outpath cluster
+                outpath = os.path.join(cwd, "results", "pca", trajn, element)  # outpath cluster
                 bashscript.append("mkdir -p " + outpath)
-                bashscript.append("gmx covar -f {trj} -s {c}/step7_production.tpr -n {ndx} -o {out}/{ele}_ev_spectrum.xvg -v {out}/{ele}_ev.trr -av {out}/{ele}_average.pdb -xpm {out}/{ele}_covar_matrix.xpm".format(
-                    trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, ele=element))
-                bashscript.append("gmx anaeig -v {out}/{ele}_ev.trr -f {trj} -eig {out}/{ele}_ev_spectrum.xvg -n {ndx} -s {c}/step7_production.tpr -first 1 -last 1 -nframes 100 -extr {out}/{ele}_eigv1.pdb".format(
-                    trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, ele=element))
-                bashscript.append("gmx anaeig -v {out}/{ele}_ev.trr -f {trj} -eig {out}/{ele}_ev_spectrum.xvg -n {ndx} -s {c}/step7_production.tpr -first 1 -last 2 -2d {out}/{ele}_proj1v2.xvg".format(
-                    trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, ele=element))
+                bashscript.append("gmx covar -f {trj} -s {c}/step7_production.tpr -n {ndx} "
+                                  "-o {out}/{tn}_{ele}_ev_spectrum.xvg -v {out}/{tn}_{ele}_ev.trr "
+                                  "-av {out}/{tn}_{ele}_average.pdb -xpm {out}/{tn}_{ele}_covar_matrix.xpm".format(
+                    trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[3], ele=element))
+                bashscript.append("gmx anaeig -v {out}/{tn}_{ele}_ev.trr -f {trj} -eig {out}/{tn}_{ele}_ev_spectrum.xvg "
+                                  "-n {ndx} -s {c}/step7_production.tpr -first 1 -last 1 -nframes 100 "
+                                  "-extr {out}/{tn}_{ele}_eigv1.pdb".format(
+                    trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[3], ele=element))
+                bashscript.append("gmx anaeig -v {out}/{tn}_{ele}_ev.trr -f {trj} -eig {out}/{tn}_{ele}_ev_spectrum.xvg "
+                                  "-n {ndx} -s {c}/step7_production.tpr -first 1 -last 2 "
+                                  "-2d {out}/{tn}_{ele}_proj1v2.xvg".format(
+                    trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[3], ele=element))
         with open("startPCA.sh", "w") as f:
-            f.write("#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --ntasks-per-node=9\n#SBATCH --cpus-per-task=2\n#SBATCH --mem=4096\n#SBATCH --mem-bind=local\n#SBATCH --nice=0\n#SBATCH --time=12:00:00\n#SBATCH --job-name=NTS1R_PCA\nmodule load cuda/10.2.89\nmodule load GROMACS/2020.2_GPU\n")
+            f.write("#!/bin/bash\n#SBATCH --gres=gpu:1\n#SBATCH --ntasks-per-node=9\n#SBATCH --cpus-per-task=2"
+                    "\n#SBATCH --mem=4096\n#SBATCH --mem-bind=local\n#SBATCH --nice=0\n#SBATCH --time=12:00:00"
+                    "\n#SBATCH --job-name=NTS1R_PCA\nmodule load cuda/10.2.89\nmodule load GROMACS/2020.2_GPU\n")
             f.write("\n".join(bashscript))
         print("\nYay, I wrote the startPCA.sh, let's go!")
 
