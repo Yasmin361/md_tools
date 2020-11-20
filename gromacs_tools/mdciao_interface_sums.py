@@ -18,7 +18,6 @@ def sum_mdc_pairs(cwd):
             line = str(line).lstrip('[').rstrip(']')
             line = line.split()
             if len(line[0].split("@")) == 2:                #pair-contact entry
-                print(line)
                 pair = "{p1} - {p2}".format(p1=line[0].lstrip("'"), p2=line[2].rstrip("'")) # only write residue name
                 if pair not in pairlist:
                     pairlist[pair] = float(line[3].lstrip("'").rstrip("'"))
