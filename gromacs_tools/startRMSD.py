@@ -77,7 +77,7 @@ def calculaterms(cwd, mode):
                 ndx_name = element
                 ndxel_path = os.path.join(ndx_path, ndx_name)
                 bashscript.append(
-                    "echo 1 0 | gmx rms -f {trj} -s {c}/step7_production.tpr "
+                    "echo 1 0 | gmx rms -f {trj} -s {c}/step7_production.tpr " 
                     "-n {ndx} -o {out}/rmsd_{tn}_{ele}.xvg -tu ns".format(
                         trj=trj_path, c=cwd, ndx=ndxel_path, out=outpath, tn=trajn.split("_")[3],  #check trajn at [3]
                         ele=element.split(".")[0]))
