@@ -32,6 +32,15 @@ def correct_pair_order(dictionary):
     return dictionary
 
 
+def extract_pair(dictionary, partnera, partnerb):
+    outdict = dict()
+    for key in dictionary:
+        partners = key.split("--")
+        if partnera in partners and partnerb in partners:
+            outdict[key] = dictionary[key]
+    return outdict
+
+
 def filter_inter_intra(cwd, limits):
     arrmin = limits[0]
     arrmax = limits[1]
@@ -89,7 +98,7 @@ def filter_inter_intra(cwd, limits):
         correct_pair_order(intraarr)
         correct_pair_order(intrantr)
         correct_pair_order(ligand)
-
+        """
         with open(os.path.join(cwd, "{rep}_saltbridges_intra_arr.list".format(rep=rep)), "w") as fo:
             for k,v in intraarr.items():
                 fo.write("{k}\t{v1}\t{v2}\n".format(k=k, v1=v[0], v2="\t".join(v[1])))
@@ -101,6 +110,12 @@ def filter_inter_intra(cwd, limits):
                 fo.write("{k}\t{v1}\t{v2}\n".format(k=k, v1=v[0], v2="\t".join(v[1])))
         with open(os.path.join(cwd, "{rep}_saltbridges_ligand.list".format(rep=rep)), "w") as fo:
             for k,v in ligand.items():
+                fo.write("{k}\t{v1}\t{v2}\n".format(k=k, v1=v[0], v2="\t".join(v[1])))
+        """
+        extract = ["LYS77", "GLU313"]
+        lysglu = extract_pair(intraarr, extract[0], extract[1])
+        with open(os.path.join(cwd, "{}_saltbridges_{}_{}.list".format(rep, extract[0], extract[1])), "w") as fo:
+            for k, v in lysglu.items():
                 fo.write("{k}\t{v1}\t{v2}\n".format(k=k, v1=v[0], v2="\t".join(v[1])))
 
 
