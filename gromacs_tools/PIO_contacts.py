@@ -22,6 +22,19 @@ def binarize(inplist):
     inplist[:] = ["1" if int(x) > 0 else x for x in inplist]
 
 
+def onlysubstantial(inpdict,cutoff):
+    outdict = dict()
+    for key in inpdict:
+        sum = 0
+        ctclist = inpdict[key][1]
+        for entry in ctclist:
+            if int(entry) == 1:
+                sum += 1
+        if sum >= (cutoff/100)*len(ctclist):
+            outdict[key] = inpdict[key]
+    return outdict
+
+
 def filter_inter_intra(cwd, limits):
     arrmin = limits[0]
     arrmax = limits[1]
@@ -66,7 +79,15 @@ def filter_inter_intra(cwd, limits):
         with open(os.path.join(cwd, "{rep}_PIO_contacts_inter_ntr.list".format(rep=rep)), "w") as fo:
             for k,v in interntr.items():
                 fo.write("{k}\t{v1}\t{v2}\n".format(k=k, v1=v[0], v2="\t".join(v[1])))
-
+        cutoff = 5        # cutoff in percent
+        interarr = onlysubstantial(interarr, cutoff)
+        interntr = onlysubstantial(interntr, cutoff)
+        with open(os.path.join(cwd, "{rep}_PIO_contacts_inter_arr_min_cutoff_{c}percent.list".format(rep=rep,c=5)), "w") as fo:
+            for k,v in interarr.items():
+                fo.write("{k}\t{v1}\t{v2}\n".format(k=k, v1=v[0], v2="\t".join(v[1])))
+        with open(os.path.join(cwd, "{rep}_PIO_contacts_inter_ntr_min_cutoff_{c}percent.list".format(rep=rep,c=5)), "w") as fo:
+            for k,v in interntr.items():
+                fo.write("{k}\t{v1}\t{v2}\n".format(k=k, v1=v[0], v2="\t".join(v[1])))
 
 if __name__ == "__main__":
     main()
