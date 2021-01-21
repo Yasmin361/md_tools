@@ -44,13 +44,14 @@ def sum_mdc_interface(cwd):
             line = str(line).lstrip('[').rstrip(']')
             line = line.split()
             if len(line[0].split("@")) == 2:                #frag0 = arrestin
-                frag0 = line[0].lstrip("'").rstrip("'").split("@")[0] # only write residue name
+                # frag0 = line[0].lstrip("'").rstrip("'").split("@")[0] # only write residue name
+                frag0 = line[0].lstrip("'").rstrip("'")  # write everything
                 if frag0 not in contactlist_arr:
                     contactlist_arr[frag0] = float(line[1].lstrip("'").rstrip("'"))
-                    continue
                 contactlist_arr[frag0] += float(line[1].lstrip("'").rstrip("'"))
             if len(line[3].split("@")) == 2:               # frag1 = receptor
-                frag1 = line[3].lstrip("'").rstrip("'").split("@")[0]
+                # frag1 = line[3].lstrip("'").rstrip("'").split("@")[0]
+                frag1 = line[3].lstrip("'").rstrip("'")
                 if frag1 not in contactlist_ntr:
                     contactlist_ntr[frag1] = float(line[4].lstrip("'").rstrip("'"))
                     continue
@@ -60,7 +61,7 @@ def sum_mdc_interface(cwd):
     for k in contactlist_ntr:
         contactlist_ntr[k] = str(round(contactlist_ntr[k], 2))
 
-    with open(os.path.join(cwd, "sum_of_replicas_arr_contacts.list"), "w") as fo:
+    with open(os.path.join(cwd, "sum_of_replicas_ligand_contacts.list"), "w") as fo:
         for item in contactlist_arr:
             fo.write("{k}\t{v}\n".format(k=item, v=contactlist_arr[item]))
 
